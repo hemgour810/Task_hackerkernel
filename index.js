@@ -9,8 +9,8 @@ const PORT = 8000;
 
 const sequelize = require("./src/config/db");
 
-require("./src/models/UserModel");
-require("./src/models/TaskModel");
+const UserModel = require("./src/models/UserModel");
+const TaskModel = require("./src/models/TaskModel");
 
 const userRoute = require("./src/routes/userRoute");
 const taskRoute = require("./src/routes/taskRoute");
@@ -25,11 +25,21 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/user", userRoute);
 app.use("/tasks", taskRoute);
 
-app.get("/", async (req, res) => {
-  const { userRoute } = require("./src/models/UserModel");
-  const { TaskModel } = require("./src/models/TaskModel");
+// app.get("/", async (req, res) => {
+//   const { userRoute } = require("./src/models/UserModel");
+//   const { TaskModel } = require("./src/models/TaskModel");
 
-  const users = await userRoute.findAll({ include: TaskModel });
+//   const users = await userRoute.findAll({ include: TaskModel });
+// });
+
+app.get("/", async (req, res) => {
+  try {
+    const users = await UserModel.findAll({ include: TaskModel });
+    res.render("home", { users });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("server error");
+  }
 });
 
 app.listen(PORT, () => {
